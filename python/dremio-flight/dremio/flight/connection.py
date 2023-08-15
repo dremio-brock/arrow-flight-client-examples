@@ -17,6 +17,7 @@ import logging
 from pyarrow import flight
 from dremio.middleware.auth import DremioClientAuthMiddlewareFactory
 from dremio.middleware.cookie import CookieMiddlewareFactory
+from http.cookies import SimpleCookie
 
 
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +37,7 @@ class DremioFlightEndpointConnection:
         self.path_to_certs = connection_args.get("path_to_certs")
         self.session_properties = connection_args.get("session_properties")
         self.engine = connection_args.get("engine")
+        self.project_id = connection_args.get("project_id")
         self._set_headers()
 
     def connect(self) -> flight.FlightClient:
@@ -50,6 +52,23 @@ class DremioFlightEndpointConnection:
             if self.tls:
                 tls_args = self._set_tls_connection_args()
                 scheme = "grpc+tls"
+            
+            if self.project_id:
+                cookie = SimpleCookie()
+                '''
+                Load "project_id=<project-uuid>" into the Cookie container.
+                Note we're no longer using it as a black box, and the client
+                is making up its own cookie which is less than conformant
+                to RFC 6265.  This should ideally not be used in production
+                systems.
+                '''
+                cookie['project_id'] = self.project_id
+                print(f'Injecting cookie(s): "{str(cookie)}"')
+                '''
+                Update the middleware's cookie jar dict, normally intended to be
+                internal-only.
+                '''
+                client_cookie_middleware.cookies.update(cookie.items())
 
             if self.username and (self.password or self.token):
                 return self._connect_to_software(

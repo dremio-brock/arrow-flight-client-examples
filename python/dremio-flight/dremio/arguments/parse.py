@@ -29,6 +29,7 @@ options_default_validator = {
     "type": {
         "hostname": str,
         "port": int,
+        "project_id": str,
         "username": str,
         "password": str,
         "token": str,

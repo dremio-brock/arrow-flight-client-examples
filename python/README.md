@@ -29,7 +29,7 @@ This example config queries the Dremio Sample dataset `NYC-taxi-trips` and retur
 ```
 hostname: data.dremio.cloud
 port: 443
-pat: <INSERT PAT HERE>
+token: <INSERT PAT HERE>
 tls: True
 query: SELECT * FROM Samples."samples.dremio.com"."NYC-taxi-trips" limit 10
 ```
@@ -58,6 +58,7 @@ This example's config file uses the [YAML](https://yaml.org/) format.
 ```
 hostname: <str>
 port: <int>
+project_id: <str>
 username: <str>
 password: <str>
 token: <str>
@@ -90,6 +91,14 @@ _required:_ False
 _default:_ 32010
 
 _description:_ Dremio flight server port.
+
+`project_id`
+
+_type:_ string
+
+_required:_ False
+
+_description:_ Dremio Cloud project id.
 
 `username`
 
